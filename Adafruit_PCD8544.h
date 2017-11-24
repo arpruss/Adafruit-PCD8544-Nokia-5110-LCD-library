@@ -18,6 +18,11 @@ All text above, and the splash screen must be included in any redistribution
 #ifndef _ADAFRUIT_PCD8544_H
 #define _ADAFRUIT_PCD8544_H
 
+// reduces how much is refreshed, which speeds it up!
+// originally derived from Steve Evans/JCW's mod but cleaned up and
+// optimized
+#define enablePartialUpdate
+
 #if defined(ARDUINO) && ARDUINO >= 100
   #include "Arduino.h"
 #else
@@ -85,9 +90,11 @@ class Adafruit_PCD8544 : public Adafruit_GFX {
   // Hardware SPI based on hardware controlled SCK (SCLK) and MOSI (DIN) pins. CS is still controlled by any IO pin.
   //Adafruit_PCD8544(int8_t DC, int8_t CS, int8_t RST);
   Adafruit_PCD8544(int8_t DC, int8_t CS, int8_t RST, SPIClass *useSPI = &SPI);
-
+  
   void begin(uint8_t contrast = 40, uint8_t bias = 0x04);
 
+  void updateBoundingBox(uint8_t xmin, uint8_t ymin, uint8_t xmax, uint8_t ymax);
+    
   void command(uint8_t c);
   void data(uint8_t c);
 

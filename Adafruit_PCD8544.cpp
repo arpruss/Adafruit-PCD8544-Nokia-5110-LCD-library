@@ -113,11 +113,6 @@ uint8_t pcd8544_buffer[LCDWIDTH * LCDHEIGHT / 8] = {
 };
 
 
-// reduces how much is refreshed, which speeds it up!
-// originally derived from Steve Evans/JCW's mod but cleaned up and
-// optimized
-//#define enablePartialUpdate
-
 #ifdef enablePartialUpdate
 static uint8_t xUpdateMin, xUpdateMax, yUpdateMin, yUpdateMax;
 #endif
@@ -217,13 +212,19 @@ void Adafruit_PCD8544::powerSaving(boolean i) {
 	}
 }
 
-static void updateBoundingBox(uint8_t xmin, uint8_t ymin, uint8_t xmax, uint8_t ymax) {
+static void _updateBoundingBox(uint8_t xmin, uint8_t ymin, uint8_t xmax, uint8_t ymax) {
 #ifdef enablePartialUpdate
   if (xmin < xUpdateMin) xUpdateMin = xmin;
   if (xmax > xUpdateMax) xUpdateMax = xmax;
   if (ymin < yUpdateMin) yUpdateMin = ymin;
   if (ymax > yUpdateMax) yUpdateMax = ymax;
 #endif
+}
+
+void Adafruit_PCD8544::updateBoundingBox(uint8_t xmin, uint8_t ymin, uint8_t xmax, uint8_t ymax) {
+#ifdef enablePartialUpdate
+    _updateBoundingBox(xmin,ymin,xmax,ymax);
+#endif    
 }
 
 Adafruit_PCD8544::Adafruit_PCD8544(int8_t SCLK, int8_t DIN, int8_t DC,
@@ -289,7 +290,7 @@ void Adafruit_PCD8544::drawPixel(int16_t x, int16_t y, uint16_t color) {
   else
     pcd8544_buffer[x+ (y/8)*LCDWIDTH] &= ~_BV(y%8);
 
-  updateBoundingBox(x,y,x,y);
+  _updateBoundingBox(x,y,x,y);
 }
 
 
